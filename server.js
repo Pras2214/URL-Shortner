@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 require('dotenv').config();
 const ShortUrl = require("./models/shortUrl");
+const path = require('path');
 const app = express();
 
 const connectDB = async () => {
@@ -24,6 +25,7 @@ app.use(async (req, res, next) => {
 });
 
 app.set("view engine", "ejs");
+app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
