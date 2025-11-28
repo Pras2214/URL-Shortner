@@ -4,7 +4,21 @@ require('dotenv').config();
 const ShortUrl = require("./models/shortUrl");
 const app = express();
 
-mongoose.connect((process.env.MONGODB_URI || "mongodb://0.0.0.0:27017") + "/urlShortner");
+const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) return;
+  const dbUrl = process.env.MONGODB_URI || "mongodb://0.0.0.0:27017/urlShortner";
+  return mongoose.connect(dbUrl);
+};
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database connection error:", error);
+    res.status(500).send("Database connection error");
+  }
+});
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: false }));
