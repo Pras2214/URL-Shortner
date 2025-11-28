@@ -6,7 +6,7 @@ const app = express();
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) return;
-  const dbUrl = import.meta.env.MONGODB_URI || "mongodb://0.0.0.0:27017/urlShortner";
+  const dbUrl = (process.env.MONGODB_URI || "mongodb://0.0.0.0:27017") + "/urlShortner";
   return mongoose.connect(dbUrl);
 };
 
