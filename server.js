@@ -5,19 +5,22 @@ const ShortUrl = require("./models/shortUrl");
 const app = express();
 
 const connectDB = async () => {
-  if (mongoose.connection.readyState >= 1) return;
-  const dbUrl = (process.env.MONGODB_URI || "mongodb://0.0.0.0:27017") + "/urlShortner";
-  return mongoose.connect(dbUrl);
+  try {
+    // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(process.env.MONGODB_URI || "mongodb://0.0.0.0:27017/urlShortner");
+      console.log("MongoDB Connected");
+    }
+  } catch (error) {
+    console.error("MongoDB Connection Error:", error);
+    process.exit(1); // Exit if we can't connect
+  }
 };
 
+// Middleware to ensure DB is connected
 app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    console.error("Database connection error:", error);
-    res.status(500).send("Database connection error");
-  }
+  await connectDB();
+  next();
 });
 
 app.set("view engine", "ejs");
