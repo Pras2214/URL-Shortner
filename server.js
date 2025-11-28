@@ -1,9 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
+require('dotenv').config();
 const ShortUrl = require("./models/shortUrl");
 const app = express();
 
-mongoose.connect("mongodb://0.0.0.0:27017/urlShortner");
+mongoose.connect((process.env.MONGODB_URI || "mongodb://0.0.0.0:27017") + "/urlShortner");
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: false }));
@@ -28,4 +29,11 @@ app.get("/:shortUrl", async (req, res) => {
   res.redirect(shortUrl.full);
 });
 
-app.listen(process.env.PORT || 3000);
+const port = process.env.PORT || 3000;
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+  });
+}
+
+module.exports = app;
